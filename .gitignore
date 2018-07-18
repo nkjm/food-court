@@ -1,0 +1,5 @@
+.env
+credential
+node_modules
+npm-debug.log
+deprecated
