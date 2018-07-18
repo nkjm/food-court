@@ -72,7 +72,7 @@ class SkillOrder {
                     } else if (typeof value == "object"){
                         bot.collect("anything_else");
 
-                        await bot.apply("order_item", value);
+                        await bot.apply_parameter("order_item", value);
                     }
 
                     return resolve();

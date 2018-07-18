@@ -119,7 +119,7 @@ for (let messenger_option of messenger_options){
         })
 
         describe("Add order item.", function(){
-            it("will remove it from order_item_list", function(){
+            it("will add it to order_item_list", function(){
                 this.timeout(60000);
 
                 let event = emu.create_postback_event(user_id, {data: JSON.stringify({
@@ -170,6 +170,47 @@ for (let messenger_option of messenger_options){
                     should.not.exist(context.confirming);
                     context.confirmed.order_item_list.should.have.lengthOf(3);
                     context.confirmed.order_item_list[0].label.should.equal("いか玉");
+                })
+            })
+        })
+
+        describe("Add order item when asked anything else.", function(){
+            it("will add it to order_item_list", function(){
+                this.timeout(60000);
+
+                let event = emu.create_postback_event(user_id, {data: JSON.stringify({
+                    _type: "intent",
+                    intent: {
+                        name: "order"
+                    }
+                })});
+                return emu.send(event).then(function(context){
+                    context.intent.name.should.equal("order");
+                    context.confirming.should.equal("order_item");
+                    let event = emu.create_postback_event(user_id, {data: JSON.stringify({
+                        label: "豚玉",
+                        quantity: 2
+                    })});
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("anything_else");
+                    let event = emu.create_postback_event(user_id, {data: JSON.stringify({
+                        label: "生ビール",
+                        quantity: 2
+                    })});
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("anything_else");
+                    let event = emu.create_message_event(user_id, "以上");
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("review");
+                    let event = emu.create_message_event(user_id, "会計");
+                    return emu.send(event);
+                }).then(function(context){
+                    should.not.exist(context.confirming);
+                    context.confirmed.order_item_list.should.have.lengthOf(2);
+                    context.confirmed.order_item_list[0].label.should.equal("生ビール");
                 })
             })
         })
