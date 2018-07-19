@@ -28,7 +28,7 @@ class SkillOrder {
                     let menu_list_message = flex.carousel_message("menu", "ご注文をおうかがいします。", context.confirmed.menu_list);
                     return resolve([{
                         type: "text",
-                        text: `ご注文の商品をお選びください。`
+                        text: `ご注文の品をお選びください。`
                     }, menu_list_message]);
                 },
                 parser: parser.order_item,

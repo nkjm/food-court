@@ -240,7 +240,7 @@ for (let messenger_option of messenger_options){
                 }).then(function(context){
                     context.confirming.should.equal("order_item");
                     let event = emu.create_postback_event(user_id, {data: JSON.stringify({
-                        label: "いか玉",
+                        label: "豚玉モダン焼き",
                         quantity: 1
                     })});
                     return emu.send(event);
@@ -251,7 +251,7 @@ for (let messenger_option of messenger_options){
                 }).then(function(context){
                     should.not.exist(context.confirming);
                     context.confirmed.order_item_list.should.have.lengthOf(3);
-                    context.confirmed.order_item_list[0].label.should.equal("いか玉");
+                    context.confirmed.order_item_list[0].label.should.equal("豚玉モダン焼き");
                 })
             })
         })
