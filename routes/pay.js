@@ -70,7 +70,7 @@ router.get('/confirm', (req, res, next) => {
         });
     }).catch((error) => {
         debug("Failed to capture payment.");
-        debug(response);
+        debug(error);
         res.sendStatus(400);
 
         // This is temp code. We should not send receipt when payment fails.
