@@ -18,14 +18,39 @@ class SkillOrder {
             order_item: {
                 message_to_confirm: async (bot, event, context, resolve, reject) => {
                     context.confirmed.menu_list = await menu_db.get_menu_list();
-                    let message = flex.carousel_message("menu", "ご注文をおうかがいします。", context.confirmed.menu_list);
-                    return resolve(message);
+                    let menu_list_message = flex.carousel_message("menu", "ご注文をおうかがいします。", context.confirmed.menu_list);
+                    return resolve([{
+                        type: "text",
+                        text: `ご注文の商品をお選びください。`
+                    }, menu_list_message]);
                 },
                 parser: parser.order_item,
                 reaction: async (error, value, bot, event, context, resolve, reject) => {
                     if (error) return resolve();
 
-                    context.confirmed.order_item_list.unshift(value);
+                    // If there is the same menu in order item list, we move the order item to top of the list and increment the quantity if it is set in value.
+                    let is_existing = false;
+                    let i = 0;
+                    for (let order_item of context.confirmed.order_item_list){
+                        if (order_item.label == value.label){
+                            is_existing = true;
+                            let order_item_to_increment_quantity = context.confirmed.order_item_list.splice(i, 1)[0];
+                            context.confirmed.order_item_list.unshift(order_item_to_increment_quantity);
+
+                            if (value.quantity){
+                                context.confirmed.order_item_list[0].quantity += value.quantity;
+                            }
+                        }
+                        i++;
+                    }
+
+                    if (!is_existing){
+                        // This is new item so we just add it to top of the order item list.
+                        context.confirmed.order_item_list.unshift(value);
+                    }
+
+                    // Calculate amount. It can be 0 since quantity may be 0 but will be set in reaction of quantity.
+                    context.confirmed.order_item_list[0].amount = context.confirmed.order_item_list[0].quantity * context.confirmed.order_item_list[0].unit_price;
 
                     if (!value.quantity){
                         bot.collect("quantity");
@@ -127,7 +152,7 @@ class SkillOrder {
                 reaction: (error, value, bot, event, context, resolve, reject) => {
                     if (error) return resolve();
 
-                    context.confirmed.order_item_list[0].quantity = value;
+                    context.confirmed.order_item_list[0].quantity += value;
                     context.confirmed.order_item_list[0].amount = context.confirmed.order_item_list[0].quantity * context.confirmed.order_item_list[0].unit_price;
 
                     return resolve();

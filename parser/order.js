@@ -8,9 +8,10 @@ class ParserOrder {
             let menu = context.confirmed.menu_list.find(menu => menu.label === value);
             if (menu){
                 return resolve({
-                    label: order_item.label,
+                    label: menu.label,
                     image: menu.image,
-                    unit_price: menu.price
+                    unit_price: menu.price,
+                    quantity: 0
                 });
             } else {
                 // Reject.
@@ -23,17 +24,17 @@ class ParserOrder {
                 if (menu){
                     if (order_item.quantity){
                         return resolve({
-                            label: order_item.label,
+                            label: menu.label,
                             image: menu.image,
                             unit_price: menu.price,
-                            quantity: order_item.quantity,
-                            amount: order_item.quantity * menu.price
+                            quantity: order_item.quantity
                         })
                     } else if (order_item.label && !order_item.quantity){
                         return resolve({
-                            label: order_item.label,
+                            label: menu.label,
                             image: menu.image,
-                            unit_price: menu.price
+                            unit_price: menu.price,
+                            quantity: 0
                         })
                     }
                 }
