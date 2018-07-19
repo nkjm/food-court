@@ -36,7 +36,8 @@ router.get('/confirm', (req, res, next) => {
     let reservation = cache.get(req.query.orderId);
 
     // Confirm & Capture the payment.
-    debug(`Going to confirm/capture payment...`);
+    debug(`Going to confirm/capture payment of following reservation..`);
+    debug(reservation);
     return pay.confirm({
         transactionId: req.query.transactionId,
         amount: reservation.amount,
