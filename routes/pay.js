@@ -63,6 +63,20 @@ router.get('/confirm', (req, res, next) => {
         debug("Failed to capture payment.");
         debug(response);
         res.sendStatus(400);
+
+        // This is temp code. We should not send receipt when payment fails.
+        return line_event.fire({
+            type: "bot-express:push",
+            to: {
+                type: "user",
+                userId: reservation.userId
+            },
+            intent: {
+                name: "robot-response",
+                fulfillment: [flex.receipt_message(reservation.order_item_list)]
+            },
+            language: reservation.language
+        });
     }).then((response) => {
         debug("Succeed to send message");
     });
