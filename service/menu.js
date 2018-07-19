@@ -1,7 +1,7 @@
 "use strict";
 
 const debug = require("debug")("bot-express:service");
-const store_type = process.env.MENU_STORE_TYPE || "file"; // file | redis
+const store_type = process.env.MENU_STORE_TYPE || "file";
 const store = require(`./menu/${store_type}.js`);
 const prefix = `menu_`;
 

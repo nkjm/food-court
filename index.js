@@ -5,9 +5,18 @@ require("dotenv").config();
 /*
 ** Import Packages
 */
-const server = require("express")();
+const express = require("express");
+const server = express();
 const bot_express = require("bot-express");
 const debug = require("debug")("bot-express:index");
+const path = require('path');
+
+/**
+Middleware Configuration
+*/
+server.set('views', path.join(__dirname, 'views'));
+server.set('view engine', 'ejs');
+server.use(express.static(path.join(__dirname, 'public')));
 
 
 /*
@@ -56,6 +65,12 @@ Mount Pay
 */
 const routes_pay = require("./routes/pay");
 server.use("/pay", routes_pay);
+
+/**
+Mount Order Board
+*/
+const routes_board = require("./routes/board");
+server.use("/board", routes_board);
 
 
 module.exports = server;

@@ -3,6 +3,7 @@
 const express = require('express');
 const router = express.Router();
 const debug = require("debug")("bot-express:route");
+const order_db = require("../service/order-db");
 const Pay = require("line-pay");
 const cache = require("memory-cache");
 const line_event = require("../service/line-event");
@@ -46,6 +47,14 @@ router.get('/confirm', (req, res, next) => {
         debug("Succeeed to capture payment.");
         res.sendStatus(200);
 
+        debug("Going to save order.");
+        return order_db.save_order({
+            line_user_id: reservation.userId,
+            id: reservation.orderId,
+            timestamp: Date.now(),
+            order_item_list: reservation.order_item_list
+        });
+    }).then((response) => {
         debug("Going to send completion message to user.");
         return line_event.fire({
             type: "bot-express:push",
@@ -59,7 +68,7 @@ router.get('/confirm', (req, res, next) => {
             },
             language: reservation.language
         });
-    }, (response) => {
+    }).catch((error) => {
         debug("Failed to capture payment.");
         debug(response);
         res.sendStatus(400);
@@ -77,8 +86,6 @@ router.get('/confirm', (req, res, next) => {
             },
             language: reservation.language
         });
-    }).then((response) => {
-        debug("Succeed to send message");
     });
 });
 
