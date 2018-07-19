@@ -237,7 +237,7 @@ class SkillOrder {
 
         // Now we can provide payment URL.
         let pay_message = flex.multi_button_message({
-            message_text: `ありがとうございます、こちらからお支払いお進みください。`,
+            message_text: `ありがとうございます、こちらからお支払いにお進みください。お品物がご準備でき次第LINEでご連絡します。`,
             action_list: [{
                 type: "uri",
                 label: `${reservation.amount}円を支払う`,
