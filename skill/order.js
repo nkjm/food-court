@@ -236,17 +236,17 @@ class SkillOrder {
         cache.put(reservation.orderId, reservation);
 
         // Now we can provide payment URL.
-        let pay_message = flex.multi_button_message(
-            `ありがとうございます、こちらからお支払いお進みください。`,
-            [{
+        let pay_message = flex.multi_button_message({
+            message_text: `ありがとうございます、こちらからお支払いお進みください。`,
+            action_list: [{
                 type: "uri",
                 label: `${reservation.amount}円を支払う`,
                 uri: reservation.payment_url
             }]
-        );
+        });
 
         await bot.reply(pay_message);
-        
+
         return resolve();
     }
 }
