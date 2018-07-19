@@ -29,6 +29,9 @@ class ServiceOrderDbMemoryCache {
         return new Promise((resolve, reject) => {
             try {
                 let order_list = this.client.get(`order_list`);
+                if (!order_list){
+                    order_list = [];
+                }
                 order_list.push(order);
                 this.client.put(`order_list`, order_list);
                 return resolve();
@@ -42,13 +45,17 @@ class ServiceOrderDbMemoryCache {
         return new Promise((resolve, reject) => {
             try {
                 let order_list = this.client.get(`order_list`);
-                let i = 0;
-                for (let order of order_list){
-                    if (order.id === order_id){
-                        order_list.splice(i, 1);
+
+                if (order_list && order_list.length > 0){
+                    let i = 0;
+                    for (let order of order_list){
+                        if (order.id === order_id){
+                            order_list.splice(i, 1);
+                        }
+                        i++;
                     }
                 }
-                i++;
+
                 this.client.put(`order_list`, order_list);
                 return resolve();
             } catch(e) {
