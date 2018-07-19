@@ -50,4 +50,12 @@ server.use("/webhook", bot_express({
     parallel_event: process.env.PARALLEL_EVENT
 }));
 
+
+/**
+Mount Pay
+*/
+const routes_pay = require("./routes/pay");
+server.use("/pay", routes_pay);
+
+
 module.exports = server;

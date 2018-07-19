@@ -5,6 +5,94 @@ const debug = require("debug");
 class ServiceFlex {
 
     /**
+    Message for receipt
+    @method
+    @param {Array.<order_item>} order_item_list
+    @return {FlexMessageObject}
+    */
+    static receipt_message(order_item_list){
+        let total_amount = 0;
+        let order_item_contents = [];
+        for (let i of order_item_list){
+            order_item_contents.push({
+                type: "box",
+                layout: "baseline",
+                contents: [{
+                    type: "text",
+                    text: i.label,
+                    size: "xs",
+                    color: "#666666",
+                    wrap: true,
+                    flex: 0
+                },{
+                    type: "text",
+                    text: `（${String(i.quantity)}個）`,
+                    size: "xs",
+                    color: "#666666",
+                },{
+                    type: "text",
+                    text: `${String(i.amount)}円`,
+                    size: "md",
+                    align: "end"
+                }]
+            })
+            total_amount += i.amount;
+        }
+
+        let message = {
+            type: "flex",
+            altText: "領収証",
+            contents: {
+                type: "bubble",
+                body: {
+                    type: "box",
+                    layout: "vertical",
+                    spacing: "xl",
+                    contents: [{
+                        type: "text",
+                        text: "領収証",
+                        weight: "bold",
+                        size: "sm",
+                        color: "#1DB446"
+                    },{
+                        type: "text",
+                        text: "飲食費",
+                        weight: "bold",
+                        size: "xl",
+                    },{
+                        type: "separator"
+                    },{
+                        type: "box",
+                        layout: "vertical",
+                        spacing: "md",
+                        contents: order_item_contents
+                    },{
+                        type: "separator"
+                    },{
+                        type: "box",
+                        layout: "baseline",
+                        contents: [{
+                            type: "text",
+                            text: `合計`,
+                            size: "md",
+                            color: "#000000",
+                            wrap: true,
+                            flex: 0
+                        },{
+                            type: "text",
+                            text: `${String(total_amount)}円`,
+                            size: "xxl",
+                            align: "end"
+                        }]
+                    }]
+                }
+            }
+        } // End of message
+
+        return message;
+    }
+
+    /**
     Message to show menu
     @method
     @param {Object} menu

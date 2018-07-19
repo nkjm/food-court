@@ -4,6 +4,13 @@ const debug = require("debug")("bot-express:skill");
 const menu_db = require("../service/menu");
 const parser = require("../parser/order");
 const flex = require("../service/flex");
+const cache = require("memory-cache");
+const Pay = require("line-pay");
+const pay = new Pay({
+    channelId: process.env.LINE_PAY_CHANNEL_ID,
+    channelSecret: process.env.LINE_PAY_CHANNEL_SECRET,
+    isSandbox: true
+});
 
 class SkillOrder {
     async begin(bot, event, context, resolve, reject){
@@ -192,11 +199,54 @@ class SkillOrder {
     }
 
     async finish(bot, event, context, resolve, reject){
-        await bot.reply({
-            type: "text",
-            text: `ご注文とお支払いが完了しました。`
-        })
+        if (process.env.BOT_EXPRESS_ENV == "test"){
+            await bot.reply(flex.receipt_message(context.confirmed.order_item_list));
+            return resolve();
+        }
 
+        let total_amount = 0;
+        for (let order_item of context.confirmed.order_item_list){
+            total_amount += order_item.amount;
+        }
+
+        let reservation = {
+            productName: `飲食費`,
+            amount: total_amount,
+            currency: "JPY",
+            orderId: `${bot.extract_sender_id()}-${Date.now()}`,
+            confirmUrl: process.env.LINE_PAY_CONFIRM_URL,
+            confirmUrlType: "SERVER"
+        }
+
+        // Call LINE Pay reserve API.
+        let reserve_response;
+        try {
+            reserve_response = await pay.reserve(reservation);
+        } catch(e) {
+            return reject(e);
+        }
+
+        reservation.transactionId = reserve_response.info.transactionId;
+        reservation.userId = bot.extract_sender_id();
+        reservation.language = context.sender_language;
+        reservation.payment_url = reserve_response.info.paymentUrl.web;
+        reservation.order_item_list = context.confirmed.order_item_list;
+
+        // Save reservation so taht confirm URL can retrieve this information.
+        cache.put(reservation.orderId, reservation);
+
+        // Now we can provide payment URL.
+        let pay_message = flex.multi_button_message(
+            `ありがとうございます、こちらからお支払いお進みください。`,
+            [{
+                type: "uri",
+                label: `${reservation.amount}円を支払う`,
+                uri: reservation.payment_url
+            }]
+        );
+
+        await bot.reply(pay_message);
+        
         return resolve();
     }
 }
