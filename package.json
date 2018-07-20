@@ -15,7 +15,7 @@
   "dependencies": {
     "blubird": "0.0.1-security",
     "bluebird": "^3.5.1",
-    "bot-express": "^0.3.23",
+    "bot-express": "^0.3.24",
     "debug": "^3.1.0",
     "dotenv": "^6.0.0",
     "ejs": "^2.6.1",
