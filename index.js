@@ -55,6 +55,7 @@ server.use("/webhook", bot_express({
     },
     line_channel_secret: process.env.LINE_CHANNEL_SECRET,
     line_access_token: process.env.LINE_ACCESS_TOKEN,
+    follow_skill: "follow",
     default_skill: process.env.DEFAULT_SKILL,
     parallel_event: process.env.PARALLEL_EVENT
 }));
