@@ -112,8 +112,36 @@ class SkillOrder {
             },
             review: {
                 message_to_confirm: async (bot, event, context, resolve, reject) => {
-                    let message = flex.review_message(context.confirmed.order_item_list);
+
+                    let message;
+                    if (context.confirmed.order_item_list.length > 0){
+                        // We have some order items.
+                        message = flex.review_message(context.confirmed.order_item_list);
+                    } else {
+                        // order item list is emply.
+                        message = flex.multi_button_message({
+                            message_text: `現在承っている注文がないようです。注文を追加されますか？`,
+                            action_list: [{
+                                type: "message",
+                                label: "キャンセル",
+                                text: "キャンセル"
+                            },{
+                                type: "message",
+                                label: "追加",
+                                text: "追加"
+                            }]
+                        })
+                    }
                     return resolve(message);
+                },
+                parser: async (value, bot, event, context, resolve, reject) => {
+                    if (typeof value != "string") reject();
+
+                    if (["訂正","追加","会計","キャンセル"].includes(value)){
+                        return resolve(value);
+                    }
+
+                    return reject();
                 },
                 reaction: async (error, value, bot, event, context, resolve, reject) => {
                     if (error) return resolve();
@@ -128,6 +156,13 @@ class SkillOrder {
                         bot.collect("order_item");
                     } else if (value == "会計"){
                         debug(`We can proceed to payment.`);
+                    } else if (value == "キャンセル"){
+                        debug(`We cancel order.`);
+                        await bot.reply({
+                            type: "text",
+                            text: `承知しました。ではご注文は一旦キャンセルさせていただきます。`
+                        })
+                        bot.init();
                     }
                     return resolve();
                 }

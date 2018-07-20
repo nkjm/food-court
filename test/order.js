@@ -200,6 +200,99 @@ for (let messenger_option of messenger_options){
             })
         })
 
+        describe("Cancel order item and nothing left so cancel.", function(){
+            it("will ask whether user wants to add or cancel order. And cancel order.", function(){
+                this.timeout(60000);
+
+                let event = emu.create_postback_event(user_id, {data: JSON.stringify({
+                    _type: "intent",
+                    intent: {
+                        name: "order"
+                    }
+                })});
+                return emu.send(event).then(function(context){
+                    context.intent.name.should.equal("order");
+                    context.confirming.should.equal("order_item");
+                    let event = emu.create_postback_event(user_id, {data: JSON.stringify({
+                        label: "豚玉",
+                        quantity: 2
+                    })});
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("anything_else");
+                    let event = emu.create_message_event(user_id, "以上");
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("review");
+                    let event = emu.create_message_event(user_id, "訂正");
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("order_item_to_cancel");
+                    let event = emu.create_message_event(user_id, "豚玉");
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("review");
+                    let event = emu.create_message_event(user_id, "キャンセル");
+                    return emu.send(event);
+                }).then(function(context){
+                    should.not.exist(context);
+                })
+            })
+        })
+
+        describe("Cancel order item and nothing left and add item.", function(){
+            it("will ask whether user wants to add or cancel order and show menu.", function(){
+                this.timeout(60000);
+
+                let event = emu.create_postback_event(user_id, {data: JSON.stringify({
+                    _type: "intent",
+                    intent: {
+                        name: "order"
+                    }
+                })});
+                return emu.send(event).then(function(context){
+                    context.intent.name.should.equal("order");
+                    context.confirming.should.equal("order_item");
+                    let event = emu.create_postback_event(user_id, {data: JSON.stringify({
+                        label: "豚玉",
+                        quantity: 2
+                    })});
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("anything_else");
+                    let event = emu.create_message_event(user_id, "以上");
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("review");
+                    let event = emu.create_message_event(user_id, "訂正");
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("order_item_to_cancel");
+                    let event = emu.create_message_event(user_id, "豚玉");
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("review");
+                    let event = emu.create_message_event(user_id, "追加");
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("order_item");
+                    let event = emu.create_postback_event(user_id, {data: JSON.stringify({
+                        label: "豚玉モダン焼き",
+                        quantity: 1
+                    })});
+                    return emu.send(event);
+                }).then(function(context){
+                    context.confirming.should.equal("review");
+                    let event = emu.create_message_event(user_id, "会計");
+                    return emu.send(event);
+                }).then(function(context){
+                    should.not.exist(context.confirming);
+                    context.confirmed.order_item_list.should.have.lengthOf(1);
+                    context.confirmed.order_item_list[0].label.should.equal("豚玉モダン焼き");
+                })
+            })
+        })
+
         describe("Add order item.", function(){
             it("will add it to order_item_list", function(){
                 this.timeout(60000);
