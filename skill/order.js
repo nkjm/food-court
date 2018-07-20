@@ -222,7 +222,11 @@ class SkillOrder {
                     let i = 0;
                     for (let order_item of context.confirmed.order_item_list){
                         if (order_item.label === value.label){
-                            context.confirmed.order_item_list.splice(i, 1);
+                            let canceled_order_item = context.confirmed.order_item_list.splice(i, 1);
+                            bot.queue({
+                                type: "text",
+                                text: `承知しました。では${canceled_order_item.label}を取り消します。`
+                            })
                         }
                         i++;
                     }
