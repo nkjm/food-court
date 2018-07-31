@@ -1,6 +1,6 @@
 "use strict";
 
-const debug = require("debug");
+const debug = require("debug")("bot-express:service");
 let t;
 
 class ServiceFlex {
@@ -191,7 +191,7 @@ class ServiceFlex {
                 height: "sm",
                 action: {
                     type: "postback",
-                    label: `${String(i)}${await t.t("unit")}`,
+                    label: `${String(i)} ${await t.t("unit")}`,
                     displayText: await t.t(`x_item`, {
                         item_label: o.label,
                         number: i
@@ -203,8 +203,6 @@ class ServiceFlex {
                 }
             })
         }
-
-        debug(JSON.stringify(bubble));
 
         return bubble;
     }

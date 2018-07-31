@@ -16,7 +16,7 @@ module.exports = class Translation {
     async translate(key, options){
 
         // Corresponding translation found.
-        if (label[key] && label[key][this.lang]){
+        if (label[key] && label[key][this.lang] !== undefined){
             let translation;
             if (options === undefined){
                 if (typeof label[key][this.lang] != "string"){
