@@ -38,7 +38,7 @@ module.exports = class Translation {
 
             // Extract the first translation.
             let source_label;
-            if (options === null){
+            if (options === undefined){
                 if (typeof label[key][Object.keys(label[key])[0]] != "string"){
                     throw new Error(`Expecting translation being string but ${typeof label[key][Object.keys(label[key])[0]]}`);
                 }
