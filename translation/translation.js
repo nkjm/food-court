@@ -39,15 +39,15 @@ module.exports = class Translation {
             // Extract the first translation.
             let source_label;
             if (options === null){
-                if (typeof lable[key][Object.keys(label[key])[0]] != "string"){
-                    throw new Error(`Expecting translation being string but ${typeof lable[key][Object.keys(label[key])[0]]}`);
+                if (typeof label[key][Object.keys(label[key])[0]] != "string"){
+                    throw new Error(`Expecting translation being string but ${typeof label[key][Object.keys(label[key])[0]]}`);
                 }
-                source_label = lable[key][Object.keys(label[key])[0]];
+                source_label = label[key][Object.keys(label[key])[0]];
             } else {
-                if (typeof lable[key][Object.keys(label[key])[0]] != "function"){
-                    throw new Error(`Expecting translation being function but ${typeof lable[key][Object.keys(label[key])[0]]}`);
+                if (typeof label[key][Object.keys(label[key])[0]] != "function"){
+                    throw new Error(`Expecting translation being function but ${typeof label[key][Object.keys(label[key])[0]]}`);
                 }
-                source_label = lable[key][Object.keys(label[key])[0]](options);
+                source_label = label[key][Object.keys(label[key])[0]](options);
             }
 
             if (this.translator && this.translator.enable_translation){
