@@ -204,6 +204,8 @@ class ServiceFlex {
             })
         }
 
+        debug(JSON.stringify(bubble));
+
         return bubble;
     }
 
@@ -499,8 +501,6 @@ class ServiceFlex {
                 break;
             }
         }
-
-        debug(JSON.stringify(message));
 
         return message;
     }

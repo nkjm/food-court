@@ -15,7 +15,7 @@ module.exports = {
     },
     unit: {
         ja: `個`,
-        en: ` unit(s)`
+        en: ``
     },
     yen: {
         ja: `円`,
