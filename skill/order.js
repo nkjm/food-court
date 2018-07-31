@@ -3,7 +3,10 @@
 const debug = require("debug")("bot-express:skill");
 const menu_db = require("../service/menu");
 const parser = require("../parser/order");
-const flex = require("../service/flex");
+const Flex = require("../service/flex");
+let flex;
+const Translation = require("../translation/translation");
+let t;
 const cache = require("memory-cache");
 const Pay = require("line-pay");
 const pay = new Pay({
@@ -14,6 +17,8 @@ const pay = new Pay({
 
 class SkillOrder {
     async begin(bot, event, context, resolve, reject){
+        t = new Translation(bot.translator, context.sender_language);
+        flex = new Flex(t);
         context.confirmed.order_item_list = [];
         return resolve();
     }
@@ -25,10 +30,10 @@ class SkillOrder {
             order_item: {
                 message_to_confirm: async (bot, event, context, resolve, reject) => {
                     context.confirmed.menu_list = await menu_db.get_menu_list();
-                    let menu_list_message = flex.carousel_message("menu", "ご注文をおうかがいします。", context.confirmed.menu_list);
+                    let menu_list_message = await flex.carousel_message("menu", await t.t(`may_i_have_your_order`), context.confirmed.menu_list);
                     return resolve([{
                         type: "text",
-                        text: `ご注文の品をお選びください。`
+                        text: await t.t(`pls_select_order`)
                     }, menu_list_message]);
                 },
                 parser: parser.order_item,
@@ -68,23 +73,26 @@ class SkillOrder {
             },
             anything_else: {
                 message_to_confirm: async (bot, event, context, resolve, reject) => {
-                    let message = flex.multi_button_message({
-                        message_text: `${context.confirmed.order_item_list[0].label}を${String(context.confirmed.order_item_list[0].quantity)}個ですね。\n他にご注文はございますか？`,
+                    let message = await flex.multi_button_message({
+                        message_text: `${await t.t("got_x_item", {
+                            item_label: context.confirmed.order_item_list[0].label,
+                            number: context.confirmed.order_item_list[0].quantity
+                        })}\n${await t.t("anything_else")}`,
                         action_list: [{
                             type: "message",
-                            label: "以上",
-                            text: "以上"
+                            label: await t.t(`no`),
+                            text: await t.t(`no`)
                         },{
                             type: "message",
-                            label: "まだある",
-                            text: "まだある"
+                            label: await t.t(`yes`),
+                            text: await t.t(`yes`)
                         }]
                     })
                     return resolve(message);
                 },
-                parser: (value, bot, event, context, resolve, reject) => {
+                parser: async (value, bot, event, context, resolve, reject) => {
                     if (typeof value == "string"){
-                        if (["以上", "まだある"].includes(value)){
+                        if ([`${await t.t("no")}`, `${await t.t("yes")}`].includes(value)){
                             return resolve(value);
                         }
                     }
@@ -95,9 +103,9 @@ class SkillOrder {
                     if (error) return resolve();
 
                     if (typeof value == "string"){
-                        if (value == "以上"){
+                        if (value == await t.t(`no`)){
                             debug("Just go to review.");
-                        } else if (value == "まだある"){
+                        } else if (value == await t.t(`yes`)){
                             bot.collect("anything_else");
                             bot.collect("order_item");
                         }
@@ -116,19 +124,19 @@ class SkillOrder {
                     let message;
                     if (context.confirmed.order_item_list.length > 0){
                         // We have some order items.
-                        message = flex.review_message(context.confirmed.order_item_list);
+                        message = await flex.review_message(context.confirmed.order_item_list);
                     } else {
                         // order item list is emply.
-                        message = flex.multi_button_message({
-                            message_text: `現在承っている注文がないようです。注文を追加されますか？`,
+                        message = await flex.multi_button_message({
+                            message_text: `${await t.t("there_is_no_order")} ${await t.t("do_you_add_order")}`,
                             action_list: [{
                                 type: "message",
-                                label: "キャンセル",
-                                text: "キャンセル"
+                                label: await t.t(`cancel`),
+                                text: await t.t(`cancel`)
                             },{
                                 type: "message",
-                                label: "追加",
-                                text: "追加"
+                                label: await t.t(`add`),
+                                text: await t.t(`add`)
                             }]
                         })
                     }
@@ -137,7 +145,7 @@ class SkillOrder {
                 parser: async (value, bot, event, context, resolve, reject) => {
                     if (typeof value != "string") reject();
 
-                    if (["訂正","追加","会計","キャンセル"].includes(value)){
+                    if ([await t.t(`modify`), await t.t(`add`), await t.t(`check`), await t.t(`cancel`)].includes(value)){
                         return resolve(value);
                     }
 
@@ -146,21 +154,21 @@ class SkillOrder {
                 reaction: async (error, value, bot, event, context, resolve, reject) => {
                     if (error) return resolve();
 
-                    if (value == "訂正"){
+                    if (value == await t.t(`modify`)){
                         debug(`We will cancel some order item.`);
                         bot.collect("review");
                         bot.collect("order_item_to_cancel");
-                    } else if (value == "追加"){
+                    } else if (value == await t.t(`add`)){
                         debug(`We will add another order item.`);
                         bot.collect("review");
                         bot.collect("order_item");
-                    } else if (value == "会計"){
+                    } else if (value == await t.t(`check`)){
                         debug(`We can proceed to payment.`);
-                    } else if (value == "キャンセル"){
+                    } else if (value == await t.t(`cancel`)){
                         debug(`We cancel order.`);
                         await bot.reply({
                             type: "text",
-                            text: `承知しました。ではご注文は一旦キャンセルさせていただきます。`
+                            text: `${await t.t("certainly")} ${await t.t("order_canceled")}`
                         })
                         bot.init();
                     }
@@ -171,10 +179,12 @@ class SkillOrder {
 
         this.optional_parameter = {
             quantity: {
-                message_to_confirm: (bot, event, context, resolve, reject) => {
+                message_to_confirm: async (bot, event, context, resolve, reject) => {
                     let message = {
                         type: "text",
-                        text: `${context.confirmed.order_item_list[0].label}の数量を教えていただけますか？`
+                        text: await t.t(`pls_tell_me_quantity_of_the_item`, {
+                            item_label: context.confirmed.order_item_list[0].label
+                        })
                     }
                     return resolve(message);
                 },
@@ -201,11 +211,11 @@ class SkillOrder {
                 }
             },
             order_item_to_cancel: {
-                message_to_confirm: (bot, event, context, resolve, reject) => {
-                    let message = flex.carousel_message("cancel_order_item", `取り消す注文を選択してください。`, context.confirmed.order_item_list);
+                message_to_confirm: async (bot, event, context, resolve, reject) => {
+                    let message = await flex.carousel_message("cancel_order_item", await t.t(`pls_select_order_to_cancel`), context.confirmed.order_item_list);
                     return resolve(message);
                 },
-                parser: (value, bot, event, context, resolve, reject) => {
+                parser: async (value, bot, event, context, resolve, reject) => {
                     if (typeof value != "string") return reject();
 
                     let order_item_to_cancel = context.confirmed.order_item_list.find(order_item => order_item.label === value);
@@ -216,7 +226,7 @@ class SkillOrder {
 
                     return reject();
                 },
-                reaction: (error, value, bot, event, context, resolve, reject) => {
+                reaction: async (error, value, bot, event, context, resolve, reject) => {
                     if (error) return resolve();
 
                     let i = 0;
@@ -225,7 +235,9 @@ class SkillOrder {
                             let canceled_order_item = context.confirmed.order_item_list.splice(i, 1)[0];
                             bot.queue({
                                 type: "text",
-                                text: `承知しました。では${canceled_order_item.label}を取り消します。`
+                                text: `${await t.t("certainly")} ${await t.t("the_item_has_been_canceled", {
+                                    item_label: canceled_order_item.label
+                                })}`
                             })
                         }
                         i++;
@@ -239,7 +251,7 @@ class SkillOrder {
 
     async finish(bot, event, context, resolve, reject){
         if (process.env.BOT_EXPRESS_ENV == "test"){
-            await bot.reply(flex.receipt_message(context.confirmed.order_item_list));
+            await bot.reply(await flex.receipt_message(context.confirmed.order_item_list));
             return resolve();
         }
 
@@ -249,7 +261,7 @@ class SkillOrder {
         }
 
         let reservation = {
-            productName: `飲食費`,
+            productName: await t.t(`food_fee`),
             amount: total_amount,
             currency: "JPY",
             orderId: `${bot.extract_sender_id()}-${Date.now()}`,
@@ -275,11 +287,13 @@ class SkillOrder {
         cache.put(reservation.orderId, reservation);
 
         // Now we can provide payment URL.
-        let pay_message = flex.multi_button_message({
-            message_text: `ありがとうございます、こちらからお支払いにお進みください。お品物がご準備でき次第LINEでご連絡します。`,
+        let pay_message = await flex.multi_button_message({
+            message_text: `${await t.t("pls_go_to_payment")} ${await t.t("let_you_know_when_food_is_ready")}`,
             action_list: [{
                 type: "uri",
-                label: `${reservation.amount}円を支払う`,
+                label: await t.t("pay_x_yen", {
+                    amount: reservation.amount
+                }),
                 uri: reservation.payment_url
             }]
         });

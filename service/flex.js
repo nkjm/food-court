@@ -1,8 +1,12 @@
 "use strict";
 
 const debug = require("debug");
+let t;
 
 class ServiceFlex {
+    constructor(translation){
+        t = translation;
+    }
 
     /**
     Message for receipt
@@ -10,7 +14,7 @@ class ServiceFlex {
     @param {Array.<order_item>} order_item_list
     @return {FlexMessageObject}
     */
-    static receipt_message(order_item_list){
+    async receipt_message(order_item_list){
         let total_amount = 0;
         let order_item_contents = [];
         for (let i of order_item_list){
@@ -26,12 +30,12 @@ class ServiceFlex {
                     flex: 0
                 },{
                     type: "text",
-                    text: `（${String(i.quantity)}個）`,
+                    text: `（${String(i.quantity)}${await t.t("unit")}）`,
                     size: "xs",
                     color: "#666666",
                 },{
                     type: "text",
-                    text: `${String(i.amount)}円`,
+                    text: `${String(i.amount)}${await t.t("yen")}`,
                     size: "md",
                     align: "end"
                 }]
@@ -41,7 +45,7 @@ class ServiceFlex {
 
         let message = {
             type: "flex",
-            altText: "領収証",
+            altText: await t.t(`receipt`),
             contents: {
                 type: "bubble",
                 body: {
@@ -50,13 +54,13 @@ class ServiceFlex {
                     spacing: "xl",
                     contents: [{
                         type: "text",
-                        text: "領収証",
+                        text: await t.t(`receipt`),
                         weight: "bold",
                         size: "sm",
                         color: "#1DB446"
                     },{
                         type: "text",
-                        text: "飲食費",
+                        text: await t.t(`food_fee`),
                         weight: "bold",
                         size: "xl",
                     },{
@@ -73,14 +77,14 @@ class ServiceFlex {
                         layout: "baseline",
                         contents: [{
                             type: "text",
-                            text: `合計`,
+                            text: await t.t(`total_amount`),
                             size: "md",
                             color: "#000000",
                             wrap: true,
                             flex: 0
                         },{
                             type: "text",
-                            text: `${String(total_amount)}円`,
+                            text: `${String(total_amount)}${await t.t("yen")}`,
                             size: "xxl",
                             align: "end"
                         }]
@@ -100,7 +104,7 @@ class ServiceFlex {
     @param {String} menu.image
     @param {Number} menu.price
     */
-    static menu_bubble(menu){
+    async menu_bubble(menu){
         let o = menu;
         const quantity_threshold = 4;
 
@@ -133,13 +137,13 @@ class ServiceFlex {
                         layout: "baseline",
                         contents: [{
                             type: "text",
-                            text: `金額`,
+                            text: await t.t(`amount`),
                             color: "#999999",
                             size: "sm",
                             flex: 0
                         },{
                             type: "text",
-                            text: `${String(o.price)}円`,
+                            text: `${String(o.price)}${await t.t("yen")}`,
                             size: "lg",
                             align: "end"
                         }]
@@ -163,8 +167,13 @@ class ServiceFlex {
                     height: "sm",
                     action: {
                         type: "postback",
-                        label: `${String(quantity_threshold + 1)}個以上`,
-                        displayText: `${o.label}を${String(quantity_threshold + 1)}個以上`,
+                        label: await t.t(`more_than_x_unit`, {
+                            number: quantity_threshold + 1
+                        }),
+                        displayText: await t.t(`more_than_x_item`, {
+                            item_label: o.label,
+                            number: quantity_threshold + 1
+                        }),
                         data: JSON.stringify({
                             label: o.label
                         })
@@ -182,8 +191,11 @@ class ServiceFlex {
                 height: "sm",
                 action: {
                     type: "postback",
-                    label: `${String(i)}個`,
-                    displayText: `${o.label}を${String(i)}個`,
+                    label: `${String(i)}${await t.t("unit")}`,
+                    displayText: await t.t(`x_item`, {
+                        item_label: o.label,
+                        number: i
+                    }),
                     data: JSON.stringify({
                         label: o.label,
                         quantity: i
@@ -203,7 +215,7 @@ class ServiceFlex {
     @param {Array.<ActionObject>} option.action_list
     @return {FlexMessageObject}
     */
-    static multi_button_message(options){
+    async multi_button_message(options){
         let o = options;
 
         let message = {
@@ -256,7 +268,7 @@ class ServiceFlex {
     @param {Array.<order_item>} order_item_list
     @return {FlexMessageObject}
     */
-    static review_message(order_item_list){
+    async review_message(order_item_list){
 
         let total_amount = 0;
         let order_item_contents = [];
@@ -273,12 +285,12 @@ class ServiceFlex {
                     flex: 0
                 },{
                     type: "text",
-                    text: `（${String(i.quantity)}個）`,
+                    text: `（${String(i.quantity)}${await t.t("unit")}）`,
                     size: "xs",
                     color: "#666666",
                 },{
                     type: "text",
-                    text: `${String(i.amount)}円`,
+                    text: `${String(i.amount)}${await t.t("yen")}`,
                     size: "md",
                     align: "end"
                 }]
@@ -288,7 +300,7 @@ class ServiceFlex {
 
         let message = {
             type: "flex",
-            altText: `ご注文はこちらの内容でよろしいでしょうか？`,
+            altText: await t.t(`is_the_order_correct`),
             contents: {
                 type: "bubble",
                 body: {
@@ -297,7 +309,7 @@ class ServiceFlex {
                     spacing: "xl",
                     contents: [{
                         type: "text",
-                        text: `ご注文はこちらの内容でよろしいでしょうか？`,
+                        text: await t.t(`is_the_order_correct`),
                         wrap: true
                     },{
                         type: "separator",
@@ -311,14 +323,14 @@ class ServiceFlex {
                         layout: "baseline",
                         contents: [{
                             type: "text",
-                            text: `合計`,
+                            text: await t.t(`total_amount`),
                             size: "md",
                             color: "#000000",
                             wrap: true,
                             flex: 0
                         },{
                             type: "text",
-                            text: `${String(total_amount)}円`,
+                            text: `${String(total_amount)}${await t.t("yen")}`,
                             size: "xxl",
                             align: "end"
                         }]
@@ -334,8 +346,8 @@ class ServiceFlex {
                         height: "sm",
                         action: {
                             type: "message",
-                            label: "会計",
-                            text: "会計"
+                            label: await t.t(`check`),
+                            text: await t.t(`check`)
                         }
                     },{
                         type: "box",
@@ -347,8 +359,8 @@ class ServiceFlex {
                             height: "sm",
                             action: {
                                 type: "message",
-                                label: "訂正",
-                                text: "訂正"
+                                label: await t.t(`modify`),
+                                text: await t.t(`modify`)
                             }
                         },{
                             type: "button",
@@ -356,8 +368,8 @@ class ServiceFlex {
                             height: "sm",
                             action: {
                                 type: "message",
-                                label: "追加",
-                                text: "追加"
+                                label: await t.t(`add`),
+                                text: await t.t(`add`)
                             }
                         }]
                     }]
@@ -374,7 +386,7 @@ class ServiceFlex {
     @param {order_item} order_item
     @return {FlexBubble}
     */
-    static cancel_order_item_bubble(order_item){
+    async cancel_order_item_bubble(order_item){
         let o = order_item;
 
         let bubble = {
@@ -412,7 +424,7 @@ class ServiceFlex {
                             flex: 0
                         },{
                             type: "text",
-                            text: `${String(o.quantity)}個`,
+                            text: `${String(o.quantity)}${await t.t("unit")}`,
                             size: "lg",
                             align: "end"
                         }]
@@ -429,7 +441,7 @@ class ServiceFlex {
                             flex: 0
                         },{
                             type: "text",
-                            text: `${String(o.amount)}円`,
+                            text: `${String(o.amount)}${await t.t("yen")}`,
                             size: "lg",
                             align: "end"
                         }]
@@ -447,7 +459,7 @@ class ServiceFlex {
                     color: "#ff0000",
                     action: {
                         type: "message",
-                        label: "取り消し",
+                        label: await t.t(`cancel`),
                         text: `${o.label}`
                     }
                 }]
@@ -466,12 +478,12 @@ class ServiceFlex {
     /**
     Carousel message
     @method
-    @param {String} bubble_type - internal static method which is defined in this class
+    @param {String} bubble_type - internal method which is defined in this class
     @param {String} alt_text
     @param {Array.<options>}
     @return {Object} flex message object
     */
-    static carousel_message(bubble_type, alt_text, option_list){
+    async carousel_message(bubble_type, alt_text, option_list){
         let message = {
             type: "flex",
             altText: alt_text,
@@ -481,7 +493,7 @@ class ServiceFlex {
             }
         }
         for (let option of option_list){
-            message.contents.contents.push(ServiceFlex[`${bubble_type}_bubble`](option));
+            message.contents.contents.push(await this[`${bubble_type}_bubble`](option));
             if (message.contents.contents.length == 10){
                 debug(`Number of contents is now 10 so we omit rest of option list.`);
                 break;
@@ -492,7 +504,7 @@ class ServiceFlex {
     }
 
 
-    static test(message){
+    test(message){
         const option = require(`../flex_test_data/${message}`);
         return JSON.stringify(ServiceFlex[message](option));
     }

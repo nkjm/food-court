@@ -21,6 +21,10 @@ class SkillRobotResponse {
             return resolve();
         }
 
+        if (message.type == "text" && message.text && bot.translator && context.sender_language != "ja"){
+            message.text = await bot.translator.translate(message.text, context.sender_language);
+        }
+
         await bot.reply(message);
         return resolve();
     }

@@ -29,7 +29,8 @@ for (let messenger_option of messenger_options){
                     _type: "intent",
                     intent: {
                         name: "order"
-                    }
+                    },
+                    language: "ja"
                 })});
                 return emu.send(event).then(function(context){
                     context.intent.name.should.equal("order");
@@ -41,7 +42,7 @@ for (let messenger_option of messenger_options){
                     return emu.send(event);
                 }).then(function(context){
                     context.confirming.should.equal("anything_else");
-                    let event = emu.create_message_event(user_id, "まだある");
+                    let event = emu.create_message_event(user_id, "はい");
                     return emu.send(event);
                 }).then(function(context){
                     context.confirming.should.equal("order_item");
@@ -52,7 +53,7 @@ for (let messenger_option of messenger_options){
                     return emu.send(event);
                 }).then(function(context){
                     context.confirming.should.equal("anything_else");
-                    let event = emu.create_message_event(user_id, "以上");
+                    let event = emu.create_message_event(user_id, "いいえ");
                     return emu.send(event);
                 }).then(function(context){
                     context.confirming.should.equal("review");
@@ -71,6 +72,7 @@ for (let messenger_option of messenger_options){
             })
         })
 
+        /*
         describe("Order without quantity", function(){
             it("will ask quantity.", function(){
                 this.timeout(60000);
@@ -476,6 +478,7 @@ for (let messenger_option of messenger_options){
                 })
             })
         })
+        */
 
     })
 }
