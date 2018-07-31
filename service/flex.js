@@ -500,6 +500,8 @@ class ServiceFlex {
             }
         }
 
+        debug(JSON.stringify(message));
+
         return message;
     }
 
