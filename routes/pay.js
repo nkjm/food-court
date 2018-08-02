@@ -54,7 +54,7 @@ router.get('/confirm', (req, res, next) => {
             timestamp: Date.now(),
             order_item_list: reservation.order_item_list
         });
-    }).then((response) => {
+    }).then(async (response) => {
         debug("Going to send completion message to user.");
         return line_event.fire({
             type: "bot-express:push",
@@ -64,7 +64,7 @@ router.get('/confirm', (req, res, next) => {
             },
             intent: {
                 name: "robot-response",
-                fulfillment: [flex.receipt_message(reservation.order_item_list)]
+                fulfillment: [await flex.receipt_message(reservation.order_item_list)]
             },
             language: reservation.language
         });
