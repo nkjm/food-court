@@ -5,7 +5,7 @@ const label = require("../translation/label");
 
 module.exports = class Translation {
     constructor(translator, lang){
-        if (!lang.match(/^[a-z]{2}$/)){
+        if (!lang.match(/^[a-z]{2}$/) && !lang.match(/^[a-z]{2}-[A-Z]{2}$/)){
             throw new Error(`Unsupported lang is specified.`);
         }
 
