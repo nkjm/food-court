@@ -143,7 +143,8 @@ class ServiceFlex {
                     type: "text", // label
                     text: o.label,
                     size: "xl",
-                    weight: "bold"
+                    weight: "bold",
+                    wrap: true
                 },{
                     type: "separator"
                 },{
