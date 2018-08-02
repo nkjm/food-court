@@ -108,6 +108,29 @@ class ServiceFlex {
         let o = menu;
         const quantity_threshold = 4;
 
+        let quantity_button_contents = [];
+        let i = 0;
+        for (let a of Array(quantity_threshold)){
+            i++;
+            quantity_button_contents.push({
+                type: "button",
+                style: "primary",
+                height: "sm",
+                action: {
+                    type: "postback",
+                    label: `${String(i)}${await t.t("unit")}`,
+                    displayText: await t.t(`x_item`, {
+                        item_label: o.label,
+                        number: i
+                    }),
+                    data: JSON.stringify({
+                        label: o.label,
+                        quantity: i
+                    })
+                }
+            })
+        }
+
         let bubble = {
             type: "bubble",
             hero: {
@@ -160,7 +183,7 @@ class ServiceFlex {
                     type: "box",
                     layout: "horizontal",
                     spacing: "sm",
-                    contents: []
+                    contents: quantity_button_contents
                 },{
                     type: "button",
                     style: "secondary",
@@ -182,27 +205,7 @@ class ServiceFlex {
             }
         }
 
-        let i = 0;
-        for (let a of Array(quantity_threshold)){
-            i++;
-            bubble.footer.contents[0].contents.push({
-                type: "button",
-                style: "primary",
-                height: "sm",
-                action: {
-                    type: "postback",
-                    label: String(i),
-                    displayText: await t.t(`x_item`, {
-                        item_label: o.label,
-                        number: i
-                    }),
-                    data: JSON.stringify({
-                        label: o.label,
-                        quantity: i
-                    })
-                }
-            })
-        }
+
 
         debug(JSON.stringify(bubble));
 

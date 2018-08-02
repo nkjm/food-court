@@ -126,7 +126,7 @@ module.exports = {
             return `${String(options.number)}個以上`;
         },
         en: (options) => {
-            return `More than ${String}`;
+            return `More than ${String(options.number)}`;
         }
     },
     more_than_x_item: {
