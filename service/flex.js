@@ -283,21 +283,16 @@ class ServiceFlex {
                 layout: "baseline",
                 contents: [{
                     type: "text",
-                    text: i.label,
+                    text: `${i.label}（${String(i.quantity)}${await t.t("unit")}）`,
                     size: "xs",
                     color: "#666666",
-                    wrap: true,
-                    flex: 0
-                },{
-                    type: "text",
-                    text: `（${String(i.quantity)}${await t.t("unit")}）`,
-                    size: "xs",
-                    color: "#666666",
+                    wrap: true
                 },{
                     type: "text",
                     text: `${String(i.amount)}${await t.t("yen")}`,
                     size: "md",
-                    align: "end"
+                    align: "end",
+                    flex: 0
                 }]
             })
             total_amount += i.amount;
