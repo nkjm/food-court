@@ -39,7 +39,7 @@ module.exports = {
     },
     amount: {
         ja: `金額`,
-        en: `Amount`
+        en: `Price`
     },
     is_the_order_correct: {
         ja: `ご注文はこちらの内容でよろしいでしょうか？`,
@@ -110,8 +110,8 @@ module.exports = {
         en: `Thank you. Please go ahead to the payment.`
     },
     let_you_know_when_food_is_ready: {
-        ja: `お品物がご準備できましたらLINEでご連絡させていただきます。`,
-        en: `I will notify you when your order is ready.`
+        ja: `決済完了後、お品物がご準備できましたらLINEでご連絡させていただきます。`,
+        en: `Once payment completed, I will send message when your order is ready.`
     },
     pay_x_yen: {
         ja: (options) => {
@@ -150,7 +150,7 @@ module.exports = {
             return `${options.item_label}を${String(options.number)}個ですね。`
         },
         en: (options) => {
-            return `${String(options.number)} ${options.item_label}.`
+            return `Certainly, ${String(options.number)} ${options.item_label}.`
         }
     }
 }
