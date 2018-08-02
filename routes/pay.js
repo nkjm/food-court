@@ -7,7 +7,10 @@ const order_db = require("../service/order-db");
 const Pay = require("line-pay");
 const cache = require("memory-cache");
 const line_event = require("../service/line-event");
-const flex = require("../service/flex");
+const Flex = require("../service/flex");
+let flex;
+const Translation = require("../translation/translation");
+let t;
 const request = require("request");
 let Promise = require("bluebird");
 Promise.promisifyAll(request);
@@ -39,6 +42,10 @@ router.get('/confirm', (req, res, next) => {
     // Confirm & Capture the payment.
     debug(`Going to confirm/capture payment of following reservation..`);
     debug(reservation);
+
+    t = new Translation(null, reservation.language);
+    flex = new Flex(t);
+
     return pay.confirm({
         transactionId: req.query.transactionId,
         amount: reservation.amount,
