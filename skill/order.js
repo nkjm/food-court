@@ -29,7 +29,7 @@ class SkillOrder {
         this.required_parameter = {
             order_item: {
                 message_to_confirm: async (bot, event, context, resolve, reject) => {
-                    context.confirmed.menu_list = await menu_db.get_menu_list();
+                    context.confirmed.menu_list = await menu_db.get_menu_list(context.sender_language);
                     let menu_list_message = await flex.carousel_message("menu", await t.t(`may_i_have_your_order`), context.confirmed.menu_list);
                     return resolve([{
                         type: "text",

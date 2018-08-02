@@ -1,15 +1,24 @@
 "use strict";
 
 module.exports = [{
-    label: "豚玉",
+    label: {
+        en: "Okonomiyaki",
+        ja: "豚玉"
+    },
     image: "https://line-objects-dev.com/waiter/menu/butatama.jpg",
     price: 700
 },{
-    label: "豚玉モダン焼き",
+    label: {
+        en: "Okonomiyaki with fried noodle",
+        ja: "豚玉モダン焼き"
+    },
     image: "https://line-objects-dev.com/waiter/menu/modern.jpg",
     price: 850
 },{
-    label: "焼きそば",
+    label: {
+        en: "Fried noodle",
+        ja: "焼きそば"
+    },
     image: "https://line-objects-dev.com/waiter/menu/yakisoba.jpg",
     price: 800,
     option: {
@@ -23,7 +32,10 @@ module.exports = [{
         }
     }
 },{
-    label: "生ビール",
+    label: {
+        en: "Beer",
+        ja: "生ビール"
+    },
     image: "https://line-objects-dev.com/waiter/menu/beer.jpg",
     price: 500
 }]

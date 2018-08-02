@@ -36,7 +36,7 @@ for (let messenger_option of messenger_options){
                     context.intent.name.should.equal("order");
                     context.confirming.should.equal("order_item");
                     let event = emu.create_postback_event(user_id, {data: JSON.stringify({
-                        label: "豚玉",
+                        label: "Okonomiyaki",
                         quantity: 2
                     })});
                     return emu.send(event);
@@ -47,7 +47,7 @@ for (let messenger_option of messenger_options){
                 }).then(function(context){
                     context.confirming.should.equal("order_item");
                     let event = emu.create_postback_event(user_id, {data: JSON.stringify({
-                        label: "生ビール",
+                        label: "Beer",
                         quantity: 1
                     })});
                     return emu.send(event);
@@ -62,10 +62,10 @@ for (let messenger_option of messenger_options){
                 }).then(function(context){
                     should.not.exist(context.confirming);
                     context.confirmed.order_item_list.should.have.lengthOf(2);
-                    context.confirmed.order_item_list[1].label.should.equal("豚玉");
+                    context.confirmed.order_item_list[1].label.should.equal("Okonomiyaki");
                     context.confirmed.order_item_list[1].quantity.should.equal(2);
                     context.confirmed.order_item_list[1].amount.should.equal(1400);
-                    context.confirmed.order_item_list[0].label.should.equal("生ビール");
+                    context.confirmed.order_item_list[0].label.should.equal("Beer");
                     context.confirmed.order_item_list[0].quantity.should.equal(1);
                     context.confirmed.order_item_list[0].amount.should.equal(500);
                 })
