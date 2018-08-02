@@ -53,7 +53,6 @@ module.exports = class Translation {
             if (this.translator && this.translator.enable_translation){
                 // If translator is available, we make translation using first translation.
                 let translation = await this.translator.translate(source_label, this.lang);
-                debug(translation);
                 return translation;
             } else {
                 // If translator is not available, we use first translation as it is.
