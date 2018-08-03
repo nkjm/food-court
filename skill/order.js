@@ -80,19 +80,19 @@ class SkillOrder {
                         })}\n${await t.t("anything_else")}`,
                         action_list: [{
                             type: "message",
-                            label: await t.t(`no`),
-                            text: await t.t(`no`)
+                            label: await t.t(`add`),
+                            text: await t.t(`add`)
                         },{
                             type: "message",
-                            label: await t.t(`yes`),
-                            text: await t.t(`yes`)
+                            label: await t.t(`thats_it`),
+                            text: await t.t(`thats_it`)
                         }]
                     })
                     return resolve(message);
                 },
                 parser: async (value, bot, event, context, resolve, reject) => {
                     if (typeof value == "string"){
-                        if ([`${await t.t("no")}`, `${await t.t("yes")}`].includes(value)){
+                        if ([`${await t.t("add")}`, `${await t.t("thats_it")}`].includes(value)){
                             return resolve(value);
                         }
                     }
@@ -103,9 +103,9 @@ class SkillOrder {
                     if (error) return resolve();
 
                     if (typeof value == "string"){
-                        if (value == await t.t(`no`)){
+                        if (value == await t.t(`thats_it`)){
                             debug("Just go to review.");
-                        } else if (value == await t.t(`yes`)){
+                        } else if (value == await t.t(`add`)){
                             bot.collect("anything_else");
                             bot.collect("order_item");
                         }

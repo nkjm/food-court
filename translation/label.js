@@ -65,6 +65,10 @@ module.exports = {
         ja: `はい`,
         en: `Yes`
     },
+    thats_it: {
+        ja: `以上`,
+        en: `That's it`
+    },
     there_is_no_order: {
         ja: `現在承っている注文はないようです。`,
         en: `There is no on going order.`

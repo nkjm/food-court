@@ -42,7 +42,7 @@ for (let messenger_option of messenger_options){
                     return emu.send(event);
                 }).then(function(context){
                     context.confirming.should.equal("anything_else");
-                    let event = emu.create_message_event(user_id, "Yes");
+                    let event = emu.create_message_event(user_id, "Add");
                     return emu.send(event);
                 }).then(function(context){
                     context.confirming.should.equal("order_item");
@@ -53,7 +53,7 @@ for (let messenger_option of messenger_options){
                     return emu.send(event);
                 }).then(function(context){
                     context.confirming.should.equal("anything_else");
-                    let event = emu.create_message_event(user_id, "No");
+                    let event = emu.create_message_event(user_id, "That's it");
                     return emu.send(event);
                 }).then(function(context){
                     context.confirming.should.equal("review");

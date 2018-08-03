@@ -25,9 +25,7 @@ class ServiceFlex {
 
         let message = {
             type: "flex",
-            altText: await t.t(`no_idea_about_the_message_from_x`, {
-                sender_name: o.sender_name
-            }),
+            altText: `${o.sender_name}から以下のメッセージを受信しました。`,
             contents: {
                 type: "bubble",
                 body: {
@@ -36,9 +34,7 @@ class ServiceFlex {
                     spacing: "xl",
                     contents: [{
                         type: "text",
-                        text: await t.t(`no_idea_about_the_message_from_x`, {
-                            sender_name: o.sender_name
-                        }),
+                        text: `${o.sender_name}から以下のメッセージを受信しました。`,
                         size: "sm",
                         wrap: true
                     },{
@@ -60,8 +56,8 @@ class ServiceFlex {
                         height: "sm",
                         action: {
                             type: "postback",
-                            label: await t.t(`answer`),
-                            displayText: await t.t(`answer`),
+                            label: `回答する`,
+                            displayText: `回答する`,
                             data: JSON.stringify({
                                 _type: "intent",
                                 intent: {
@@ -298,6 +294,16 @@ class ServiceFlex {
     async multi_button_message(options){
         let o = options;
 
+        let button_contents = []
+        for (let action of o.action_list){
+            button_contents.push({
+                type: "button",
+                style: "link",
+                height: "sm",
+                action: action
+            })
+        }
+
         let message = {
             type: "flex",
             altText: o.message_text,
@@ -316,18 +322,9 @@ class ServiceFlex {
                     type: "box",
                     layout: "horizontal",
                     spacing: "sm",
-                    contents: []
+                    contents: button_contents
                 }
             }
-        }
-
-        for (let action of o.action_list){
-            message.contents.footer.contents.push({
-                type: "button",
-                style: "link",
-                height: "sm",
-                action: action
-            })
         }
 
         return message;
