@@ -46,8 +46,8 @@ class ServiceFlex {
                     },{
                         type: "text",
                         text: o.message_text,
-                        size: "sm",
-                        color: `#999999`,
+                        size: "md",
+                        color: `#666666`,
                         wrap: true
                     }]
                 },

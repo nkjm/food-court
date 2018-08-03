@@ -49,10 +49,14 @@ module.exports = class SkillEscalation {
             message_text = event.message.text;
         }
 
+        // This is tricky but real sender is not important in this skill so we set bot language as sender_language.
+        let sender_language = context.sender_language;
+        context.sender_language = bot.language;
+
         let message = await flex.escalation_message({
             sender_id: bot.extract_sender_id(),
             sender_name: sender.displayName,
-            sender_language: context.sender_language,
+            sender_language: sender_language,
             bot_language: bot.language,
             message_text: message_text
         })
