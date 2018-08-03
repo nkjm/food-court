@@ -54,7 +54,7 @@ module.exports = class SkillEscalation {
         let message = await flex.escalation_message({
             sender_id: bot.extract_sender_id(),
             sender_name: sender.displayName,
-            sender_language: context.sender_language.
+            sender_language: context.sender_language,
             bot_language: bot.language,
             message_text: message_text
         })
