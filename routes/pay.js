@@ -7,10 +7,6 @@ const order_db = require("../service/order-db");
 const Pay = require("line-pay");
 const cache = require("memory-cache");
 const line_event = require("../service/line-event");
-const Flex = require("../service/flex");
-let flex;
-const Translation = require("../translation/translation");
-let t;
 const request = require("request");
 let Promise = require("bluebird");
 Promise.promisifyAll(request);
@@ -43,9 +39,6 @@ router.get('/confirm', (req, res, next) => {
     debug(`Going to confirm/capture payment of following reservation..`);
     debug(reservation);
 
-    t = new Translation(null, reservation.language);
-    flex = new Flex(t);
-
     return pay.confirm({
         transactionId: req.query.transactionId,
         amount: reservation.amount,
@@ -70,8 +63,10 @@ router.get('/confirm', (req, res, next) => {
                 userId: reservation.userId
             },
             intent: {
-                name: "robot-response",
-                fulfillment: [await flex.receipt_message(reservation.order_item_list)]
+                name: "send-receipt",
+                parameters: {
+                    order_item_list: reservation.order_item_list
+                }
             },
             language: reservation.language
         });
@@ -88,8 +83,10 @@ router.get('/confirm', (req, res, next) => {
                 userId: reservation.userId
             },
             intent: {
-                name: "robot-response",
-                fulfillment: [flex.receipt_message(reservation.order_item_list)]
+                name: "send-receipt",
+                parameters: {
+                    order_item_list: reservation.order_item_list
+                }
             },
             language: reservation.language
         });

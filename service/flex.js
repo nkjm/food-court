@@ -2,10 +2,89 @@
 
 const debug = require("debug")("bot-express:service");
 let t;
+const BOT_LANGUAGE = "ja";
 
 class ServiceFlex {
     constructor(translation){
         t = translation;
+    }
+
+    /**
+    Message for escalation
+    @method
+    @param {Object} options
+    @param {String} options.sender_id
+    @param {String} options.sender_name
+    @param {String} options.sender_language
+    @param {String} options.bot_language
+    @param {String} options.message_text
+    @return {FlexMessageObject}
+    */
+    async escalation_message(options){
+        let o = options;
+
+        let message = {
+            type: "flex",
+            altText: await t.t(`no_idea_about_the_message_from_x`, {
+                sender_name: o.sender_name
+            }),
+            contents: {
+                type: "bubble",
+                body: {
+                    type: "box",
+                    layout: "vertical",
+                    spacing: "xl",
+                    contents: [{
+                        type: "text",
+                        text: await t.t(`no_idea_about_the_message_from_x`, {
+                            sender_name: o.sender_name
+                        }),
+                        size: "sm",
+                        wrap: true
+                    },{
+                        type: "separator"
+                    },{
+                        type: "text",
+                        text: o.message_text,
+                        size: "sm",
+                        color: `#999999`,
+                        wrap: true
+                    }]
+                },
+                footer: {
+                    type: "box",
+                    layout: "vertical",
+                    contents: [{
+                        type: "button",
+                        style: "primary",
+                        height: "sm",
+                        action: {
+                            type: "postback",
+                            label: await t.t(`answer`),
+                            displayText: await t.t(`answer`),
+                            data: JSON.stringify({
+                                _type: "intent",
+                                intent: {
+                                    name: "human-response",
+                                    parameters: {
+                                        user: {
+                                            id: o.sender_id,
+                                            language: o.sender_language
+                                        },
+                                        question: o.message_text
+                                    }
+                                },
+                                language: o.bot_language
+                            })
+                        }
+                    }]
+                }
+            }
+        }
+
+        debug(JSON.stringify(message));
+
+        return message;
     }
 
     /**

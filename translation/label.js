@@ -152,5 +152,33 @@ module.exports = {
         en: (options) => {
             return `Certainly, ${String(options.number)} ${options.item_label}.`
         }
+    },
+    no_idea_about_the_message_from_x: {
+        ja: (options) => {
+            return `${options.sender_name}から受信した以下のメッセージがわかりませんでした。`
+        },
+        en: (options) => {
+            return `I have no idea about the following message from ${options.sender_name}.`
+        }
+    },
+    answer: {
+        ja: `回答する`,
+        en: `Answer`
+    },
+    answer_pls: {
+        ja: `回答をお願いします。`,
+        en: `Answer please.`
+    },
+    do_you_want_chatbot_learn_this_question: {
+        ja: `ChatbotにこのQ&Aを学習させますか？`,
+        en: `Do you want Chatbot to learn this Q&A?`
+    },
+    chatbot_completed_learning: {
+        ja: `学習が完了しました。`,
+        en: `Chatbot learned this Q&A.`
+    },
+    i_will_reply_to_user_with_your_answer: {
+        ja: `いただいた回答をユーザーに送信しておきます。`,
+        en: `I will reply to the user with your answer.`
     }
 }
