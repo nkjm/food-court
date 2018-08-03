@@ -266,7 +266,11 @@ class SkillOrder {
             currency: "JPY",
             orderId: `${bot.extract_sender_id()}-${Date.now()}`,
             confirmUrl: process.env.LINE_PAY_CONFIRM_URL,
-            confirmUrlType: "SERVER"
+            confirmUrlType: "SERVER",
+        }
+
+        if (context.sender_language){
+            reservation.langCd = context.sender_language;
         }
 
         // Call LINE Pay reserve API.
