@@ -14,6 +14,7 @@ const pay = new Pay({
     channelSecret: process.env.LINE_PAY_CHANNEL_SECRET,
     isSandbox: true
 });
+const LIFF_PAY_SANDBOX = process.env.LIFF_PAY_SANDBOX;
 
 class SkillOrder {
     async begin(bot, event, context, resolve, reject){
@@ -287,6 +288,10 @@ class SkillOrder {
         reservation.payment_url = reserve_response.info.paymentUrl.web;
         reservation.order_item_list = context.confirmed.order_item_list;
 
+        debug(reservation.payment_url);
+        let transaction_reserve_id = reservation.payment_url.split("transactionReserveId=")[1];
+        debug(transaction_reserve_id);
+
         // Save reservation so taht confirm URL can retrieve this information.
         cache.put(reservation.orderId, reservation);
 
@@ -298,6 +303,7 @@ class SkillOrder {
                 label: await t.t("pay_x_yen", {
                     amount: reservation.amount
                 }),
+                //uri: `line://app/${LIFF_PAY_SANDBOX}/?transactionReserveId=${transaction_reserve_id}`
                 uri: reservation.payment_url
             }]
         });
