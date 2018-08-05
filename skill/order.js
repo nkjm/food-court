@@ -289,8 +289,8 @@ class SkillOrder {
         reservation.order_item_list = context.confirmed.order_item_list;
 
         debug(reservation.payment_url);
-        let transaction_reserve_id = reservation.payment_url.split("transactionReserveId=")[1];
-        debug(transaction_reserve_id);
+        let query_string = reservation.payment_url.split("?")[1];
+        debug(query_string);
 
         // Save reservation so taht confirm URL can retrieve this information.
         cache.put(reservation.orderId, reservation);
@@ -303,8 +303,8 @@ class SkillOrder {
                 label: await t.t("pay_x_yen", {
                     amount: reservation.amount
                 }),
-                //uri: `line://app/${LIFF_PAY_SANDBOX}/?transactionReserveId=${transaction_reserve_id}`
-                uri: reservation.payment_url
+                uri: `line://app/${LIFF_PAY_SANDBOX}/?${query_string}`
+                //uri: reservation.payment_url
             }]
         });
 
