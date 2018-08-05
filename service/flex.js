@@ -575,11 +575,12 @@ class ServiceFlex {
         return message;
     }
 
-
+    /*
     test(message){
         const option = require(`../flex_test_data/${message}`);
         return JSON.stringify(ServiceFlex[message](option));
     }
+    */
 }
 
 module.exports = ServiceFlex;
